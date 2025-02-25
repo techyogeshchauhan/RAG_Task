@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Retrieval-Augmented Generation (RAG) System</h1>
+        <input type="text" id="query" placeholder="Enter your question...">
+        <button onclick="askQuestion()">Ask</button>
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        async function askQuestion() {
+            const query = document.getElementById('query').value;
+            if (!query) {
+                alert("Please enter a question!");
+                return;
+            }
+
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = "Thinking...";
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query }),
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    responseDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
+                } else {
+                    responseDiv.innerHTML = `
+                        <strong>Question:</strong> ${data.query}<br>
+                        <strong>Answer:</strong> ${data.answer}
+                    `;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
